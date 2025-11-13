@@ -1,0 +1,106 @@
+import java.io.*;
+import java.util.*;
+
+public class ToDoListWithFile {
+    static final String FILE_NAME = "tasks.txt";
+    static ArrayList<String> tasks = new ArrayList<>();
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        loadTasks();
+
+        int choice;
+        do {
+            System.out.println("\n=== TO-DO LIST APPLICATION ===");
+            System.out.println("1. Add Task");
+            System.out.println("2. View Tasks");
+            System.out.println("3. Delete Task");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter new task: ");
+                    String task = sc.nextLine();
+                    tasks.add(task);
+                    saveTasks();
+                    System.out.println(" Task added successfully!");
+                    break;
+
+                case 2:
+                    viewTasks();
+                    break;
+
+                case 3:
+                    deleteTask(sc);
+                    saveTasks();
+                    break;
+
+                case 4:
+                    System.out.println("Exiting... Have a productive day!");
+                    break;
+
+                default:
+                    System.out.println(" Invalid choice! Try again.");
+            }
+        } while (choice != 4);
+
+        sc.close();
+    }
+
+   
+    public static void saveTasks() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            for (String task : tasks) {
+                writer.write(task);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println(" Error saving tasks: " + e.getMessage());
+        }
+    }
+
+    // 📖 Load tasks from file
+    public static void loadTasks() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                tasks.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            // No file yet, ignore
+        } catch (IOException e) {
+            System.out.println(" Error loading tasks: " + e.getMessage());
+        }
+    }
+
+    public static void viewTasks() {
+        System.out.println("\nYour Tasks:");
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks found!");
+        } else {
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + ". " + tasks.get(i));
+            }
+        }
+    }
+
+   
+    public static void deleteTask(Scanner sc) {
+        viewTasks();
+        if (tasks.isEmpty()) return;
+
+        System.out.print("Enter task number to delete: ");
+        int num = sc.nextInt();
+
+        if (num > 0 && num <= tasks.size()) {
+            tasks.remove(num - 1);
+            System.out.println("🗑️ Task deleted!");
+        } else {
+            System.out.println("Invalid task number!");
+        }
+    }
+}
